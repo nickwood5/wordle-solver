@@ -7,8 +7,6 @@ for line in all_words_file:
 
 all_words_file.close()
 
-
-
 def check_valid(does_not_contain, contains, word, valid_letters, invalid_letters):
 
     for invalid_letter in invalid_letters:
@@ -29,7 +27,7 @@ def check_valid(does_not_contain, contains, word, valid_letters, invalid_letters
     
     return True
 
-def generate_options(does_not_contain, contains, valid_letters, invalid_letters):
+def generate_options(does_not_contain, contains, valid_letters, invalid_letters, valid_words):
     options = []
     
     for word in valid_words:
@@ -38,22 +36,33 @@ def generate_options(does_not_contain, contains, valid_letters, invalid_letters)
 
     return options
 
+def select_option(does_not_contain, contains, valid_letters, invalid_letters, possible_words):
+    num_potential_options = []
+    for word in possible_words:
+        # Assume that all new letters won't be in the guessed word
+        new_letters = []
+        for letter in word:
+            if letter not in contains:
+                new_letters.append(letter)
+
+        ideal_does_not_contain = new_letters + does_not_contain
+
+        options_result = generate_options(ideal_does_not_contain, contains, valid_letters, invalid_letters, possible_words)
+        num_potential_options.append(len(options_result))
+    
+    min_words = min(num_potential_options)
+    min_index = num_potential_options.index(min_words)
+
+    return possible_words[min_index]
+
 searching = True
 does_not_contain = []
 contains = []
 valid_letters = []
 invalid_letters = []
 
-
-getting_input = True
-while getting_input:
-    first_guess = input("Enter first guess: ")
-    if first_guess.isalpha() and len(first_guess) == 5 and first_guess.isupper():
-        getting_input = False
-    else:
-        print("Invalid input...")
-
-word = first_guess
+# First guess -> calculated using select_option function on empty game state
+word = "STOAE"
 
 while searching:
 
@@ -83,12 +92,8 @@ while searching:
                     valid_letters.append(log)
                     contains.append(letter)
 
-    valid_words = generate_options(does_not_contain, contains, valid_letters, invalid_letters)
+    valid_words = generate_options(does_not_contain, contains, valid_letters, invalid_letters, valid_words)
 
-    suggesting_word = True
-    if len(valid_words) == 0:
-        print("No possible words...")
-        exit()
-    
-    word = valid_words[0]
+    word = select_option(does_not_contain, contains, valid_letters, invalid_letters, valid_words)
+
     print("Guess word {}".format(word))
