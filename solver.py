@@ -1,17 +1,13 @@
-all_words_file = open("wordle-solver/words.txt", "r")
+all_words_file = open("wordle-words.txt", "r")
 
-all_words = []
+valid_words = []
 for line in all_words_file:
   stripped_line = line.strip()
-  all_words.append(stripped_line)
+  valid_words.append(stripped_line.upper())
 
 all_words_file.close()
 
-valid_words = []
 
-for word in all_words:
-    if len(word) == 5 and word.isalpha():
-        valid_words.append(word.upper())
 
 def check_valid(does_not_contain, contains, word, valid_letters, invalid_letters):
 
@@ -90,22 +86,9 @@ while searching:
     valid_words = generate_options(does_not_contain, contains, valid_letters, invalid_letters)
 
     suggesting_word = True
-    i = 0
-    while suggesting_word:
-        if i == len(valid_words):
-            print("No possible words...")
-            exit()
-
-        print("Guess word {}".format(valid_words[i]))
-        getting_input = True
-        while getting_input:
-            valid = input("Is suggested word valid (y/n): ")
-            if valid == 'y' or valid == 'n':
-                getting_input = False
-            else:
-                print("Invalid input...")
-        if valid == 'y':
-            suggesting_word = False
-            word = valid_words[i]
-        else:
-            i += 1
+    if len(valid_words) == 0:
+        print("No possible words...")
+        exit()
+    
+    word = valid_words[0]
+    print("Guess word {}".format(word))
